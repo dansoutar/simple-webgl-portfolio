@@ -37645,7 +37645,11 @@ class MapControls extends OrbitControls {
 }
 
 exports.MapControls = MapControls;
-},{"three":"node_modules/three/build/three.module.js"}],"app.js":[function(require,module,exports) {
+},{"three":"node_modules/three/build/three.module.js"}],"shaders/vertex.glsl":[function(require,module,exports) {
+module.exports = "#define GLSLIFY 1\nuniform float time;\nvarying float pulse; \n\nvoid main() {\n    vec3 newPosition = position;\n\n    \n    newPosition.z = sin(length(newPosition) * 30.0 + time) * 0.05;\n    \n    pulse = 20.0 * newPosition.z;\n\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);\n}";
+},{}],"shaders/fragment.glsl":[function(require,module,exports) {
+module.exports = "#define GLSLIFY 1\nvarying float pulse;\n\nvoid main() {\n  gl_FragColor = vec4(1.0, pulse, 0.0, 1.0);\n}";
+},{}],"app.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37656,6 +37660,12 @@ exports.default = void 0;
 var THREE = _interopRequireWildcard(require("three"));
 
 var _OrbitControls = require("three/examples/jsm/controls/OrbitControls.js");
+
+var _vertex = _interopRequireDefault(require("./shaders/vertex.glsl"));
+
+var _fragment = _interopRequireDefault(require("./shaders/fragment.glsl"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -37707,8 +37717,21 @@ var Sketch = /*#__PURE__*/function () {
   }, {
     key: "addObjects",
     value: function addObjects() {
-      this.geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-      this.material = new THREE.MeshNormalMaterial();
+      this.geometry = new THREE.PlaneBufferGeometry(1, 1, 100, 100);
+      this.material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: {
+            value: 1.0
+          },
+          resolution: {
+            value: new THREE.Vector2()
+          }
+        },
+        side: THREE.DoubleSide,
+        wireframe: true,
+        vertexShader: _vertex.default,
+        fragmentShader: _fragment.default
+      });
       this.mesh = new THREE.Mesh(this.geometry, this.material);
       this.scene.add(this.mesh);
     }
@@ -37716,6 +37739,7 @@ var Sketch = /*#__PURE__*/function () {
     key: "render",
     value: function render() {
       this.time += 0.05;
+      this.material.uniforms.time.value = this.time;
       this.mesh.rotation.x = this.time / 2000;
       this.mesh.rotation.y = this.time / 1000;
       this.renderer.render(this.scene, this.camera);
@@ -37730,7 +37754,7 @@ exports.default = Sketch;
 new Sketch({
   domElement: document.querySelector('#container')
 });
-},{"three":"node_modules/three/build/three.module.js","three/examples/jsm/controls/OrbitControls.js":"node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"node_modules/three/build/three.module.js","three/examples/jsm/controls/OrbitControls.js":"node_modules/three/examples/jsm/controls/OrbitControls.js","./shaders/vertex.glsl":"shaders/vertex.glsl","./shaders/fragment.glsl":"shaders/fragment.glsl"}],"../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -37758,7 +37782,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65427" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51382" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

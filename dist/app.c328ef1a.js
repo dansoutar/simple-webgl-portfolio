@@ -37646,9 +37646,11 @@ class MapControls extends OrbitControls {
 
 exports.MapControls = MapControls;
 },{"three":"node_modules/three/build/three.module.js"}],"shaders/vertex.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nuniform float time;\nvarying float pulse; \n\nvoid main() {\n    vec3 newPosition = position;\n\n    \n    newPosition.z = sin(length(newPosition) * 30.0 + time) * 0.05;\n    \n    pulse = 20.0 * newPosition.z;\n\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);\n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\n\nvarying float pulse;\nvarying vec2 vUv;\n\nvoid main() {\n    vec3 newPosition = position;\n\n    vUv = uv;\n\n    newPosition.z = sin(length(newPosition) * 30.0 + time) * 0.05;\n    \n    pulse = 20.0 * newPosition.z;\n\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); \n}";
 },{}],"shaders/fragment.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nvarying float pulse;\n\nvoid main() {\n  gl_FragColor = vec4(1.0, pulse, 0.0, 1.0);\n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform sampler2D uTexture;\n\nvarying float pulse;\nvarying vec2 vUv;\n\nvoid main() {\n  float sinePulse = (1.0 + sin(vUv.x * 50.0 + time)) / 2.0;\n\n  vec4 myImage = texture(uTexture, vUv + sin(vUv * 20.0 + time) * 0.012);\n\n  gl_FragColor = myImage;\n}";
+},{}],"water.jpg":[function(require,module,exports) {
+module.exports = "/water.a2752b90.jpg";
 },{}],"app.js":[function(require,module,exports) {
 "use strict";
 
@@ -37664,6 +37666,8 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls.js");
 var _vertex = _interopRequireDefault(require("./shaders/vertex.glsl"));
 
 var _fragment = _interopRequireDefault(require("./shaders/fragment.glsl"));
+
+var _water = _interopRequireDefault(require("./water.jpg"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37725,10 +37729,13 @@ var Sketch = /*#__PURE__*/function () {
           },
           resolution: {
             value: new THREE.Vector2()
+          },
+          uTexture: {
+            value: new THREE.TextureLoader().load(_water.default)
           }
         },
         side: THREE.DoubleSide,
-        wireframe: true,
+        // wireframe: true,
         vertexShader: _vertex.default,
         fragmentShader: _fragment.default
       });
@@ -37754,7 +37761,7 @@ exports.default = Sketch;
 new Sketch({
   domElement: document.querySelector('#container')
 });
-},{"three":"node_modules/three/build/three.module.js","three/examples/jsm/controls/OrbitControls.js":"node_modules/three/examples/jsm/controls/OrbitControls.js","./shaders/vertex.glsl":"shaders/vertex.glsl","./shaders/fragment.glsl":"shaders/fragment.glsl"}],"../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"node_modules/three/build/three.module.js","three/examples/jsm/controls/OrbitControls.js":"node_modules/three/examples/jsm/controls/OrbitControls.js","./shaders/vertex.glsl":"shaders/vertex.glsl","./shaders/fragment.glsl":"shaders/fragment.glsl","./water.jpg":"water.jpg"}],"../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -37782,7 +37789,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51382" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63536" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

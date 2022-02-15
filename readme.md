@@ -47,3 +47,27 @@
 - send this.time to a uniform in the vertex shader
 - add time inside the sin()
 - try changing newPosition.x to the length() of position
+
+## Fragment Shaders
+
+- create vUv var in vertex shader
+- set vUv to uv in main function
+- declare same vuv in frag shader
+- declare uniform time as well
+- set position in vertex back to normal position
+- set vuv as first 3 of gl-fragcolor
+- create sinPulse var in frag shader main func
+- multiple sinePulse by 10
+- map sin range to uv range
+- get vuv.x bc of error
+- put sinPulse intol fragcolor
+- add time to sinePulse
+- get texture from src code
+- import texture into app.js file
+- add texture to uniforms obj in js file using texture loader
+- bring in texture uniform in frag shader with sampler2D
+- use texture func in main func; pass in texture uniform and vuv
+- outpute img value instead of sinePulse
+- turn off wireframe
+- add sin and time to vuv in texture func
+- chanfge texture to water img

@@ -71,3 +71,23 @@
 - turn off wireframe
 - add sin and time to vuv in texture func
 - chanfge texture to water img
+
+## Combining Shaders
+
+- change geo to sphere geo
+- create a varying for normals in vert and pass to frag
+- add vNormal to frag color
+- find glsl noise gist
+- get 4d noise function
+- bring into vert shader file
+- add normals to new position
+- multiply normal by snoise function and pass in normals and time into vec4 (4D nosie)
+- add more triangles to the sphere
+- move noise in vert shader into noise var
+- set pulse var to noise
+- set fragcolor to pulse
+- add 1 and half pulse var
+
+## Sync Html and webGl Dimensions
+
+-

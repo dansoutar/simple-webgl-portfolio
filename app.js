@@ -12,8 +12,9 @@ export default class Sketch {
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
 
-    this.camera = new THREE.PerspectiveCamera(70, this.width / this.height, 0.01, 10)
-    this.camera.position.z = 1
+    this.camera = new THREE.PerspectiveCamera(30, this.width / this.height, 10, 1000)
+    this.camera.position.z = 600
+    this.camera.fov = 2 * Math.atan(this.height / 2 / this.camera.position.z) * (180 / Math.PI)
 
     this.scene = new THREE.Scene()
 
@@ -44,7 +45,7 @@ export default class Sketch {
   }
 
   addObjects() {
-    this.geometry = new THREE.SphereBufferGeometry(0.5, 160, 160)
+    this.geometry = new THREE.PlaneBufferGeometry(350, 350, 100, 100)
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 1.0 },

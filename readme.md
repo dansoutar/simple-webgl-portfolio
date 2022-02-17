@@ -90,4 +90,6 @@
 
 ## Sync Html and webGl Dimensions
 
+- set camera position to 600
+- calculate fov to be screen size
 -

@@ -37646,9 +37646,9 @@ class MapControls extends OrbitControls {
 
 exports.MapControls = MapControls;
 },{"three":"node_modules/three/build/three.module.js"}],"shaders/vertex.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nuniform float time;\n\nvarying float pulse;\nvarying vec2 vUv;\nvarying vec3 vNormal;\n\n// 4D Noise\nvec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}\nfloat permute(float x){return floor(mod(((x*34.0)+1.0)*x, 289.0));}\nvec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}\nfloat taylorInvSqrt(float r){return 1.79284291400159 - 0.85373472095314 * r;}\n\nvec4 grad4(float j, vec4 ip){\n  const vec4 ones = vec4(1.0, 1.0, 1.0, -1.0);\n  vec4 p,s;\n\n  p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;\n  p.w = 1.5 - dot(abs(p.xyz), ones.xyz);\n  s = vec4(lessThan(p, vec4(0.0)));\n  p.xyz = p.xyz + (s.xyz*2.0 - 1.0) * s.www; \n\n  return p;\n}\n\nfloat snoise(vec4 v){\n  const vec2  C = vec2( 0.138196601125010504,  // (5 - sqrt(5))/20  G4\n                        0.309016994374947451); // (sqrt(5) - 1)/4   F4\n// First corner\n  vec4 i  = floor(v + dot(v, C.yyyy) );\n  vec4 x0 = v -   i + dot(i, C.xxxx);\n\n// Other corners\n\n// Rank sorting originally contributed by Bill Licea-Kane, AMD (formerly ATI)\n  vec4 i0;\n\n  vec3 isX = step( x0.yzw, x0.xxx );\n  vec3 isYZ = step( x0.zww, x0.yyz );\n//  i0.x = dot( isX, vec3( 1.0 ) );\n  i0.x = isX.x + isX.y + isX.z;\n  i0.yzw = 1.0 - isX;\n\n//  i0.y += dot( isYZ.xy, vec2( 1.0 ) );\n  i0.y += isYZ.x + isYZ.y;\n  i0.zw += 1.0 - isYZ.xy;\n\n  i0.z += isYZ.z;\n  i0.w += 1.0 - isYZ.z;\n\n  // i0 now contains the unique values 0,1,2,3 in each channel\n  vec4 i3 = clamp( i0, 0.0, 1.0 );\n  vec4 i2 = clamp( i0-1.0, 0.0, 1.0 );\n  vec4 i1 = clamp( i0-2.0, 0.0, 1.0 );\n\n  //  x0 = x0 - 0.0 + 0.0 * C \n  vec4 x1 = x0 - i1 + 1.0 * C.xxxx;\n  vec4 x2 = x0 - i2 + 2.0 * C.xxxx;\n  vec4 x3 = x0 - i3 + 3.0 * C.xxxx;\n  vec4 x4 = x0 - 1.0 + 4.0 * C.xxxx;\n\n// Permutations\n  i = mod(i, 289.0); \n  float j0 = permute( permute( permute( permute(i.w) + i.z) + i.y) + i.x);\n  vec4 j1 = permute( permute( permute( permute (\n             i.w + vec4(i1.w, i2.w, i3.w, 1.0 ))\n           + i.z + vec4(i1.z, i2.z, i3.z, 1.0 ))\n           + i.y + vec4(i1.y, i2.y, i3.y, 1.0 ))\n           + i.x + vec4(i1.x, i2.x, i3.x, 1.0 ));\n// Gradients\n// ( 7*7*6 points uniformly over a cube, mapped onto a 4-octahedron.)\n// 7*7*6 = 294, which is close to the ring size 17*17 = 289.\n\n  vec4 ip = vec4(1.0/294.0, 1.0/49.0, 1.0/7.0, 0.0) ;\n\n  vec4 p0 = grad4(j0,   ip);\n  vec4 p1 = grad4(j1.x, ip);\n  vec4 p2 = grad4(j1.y, ip);\n  vec4 p3 = grad4(j1.z, ip);\n  vec4 p4 = grad4(j1.w, ip);\n\n// Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n  p4 *= taylorInvSqrt(dot(p4,p4));\n\n// Mix contributions from the five corners\n  vec3 m0 = max(0.6 - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0);\n  vec2 m1 = max(0.6 - vec2(dot(x3,x3), dot(x4,x4)            ), 0.0);\n  m0 = m0 * m0;\n  m1 = m1 * m1;\n  return 49.0 * ( dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))\n               + dot(m1*m1, vec2( dot( p3, x3 ), dot( p4, x4 ) ) ) ) ;\n\n}\n\n// --------------------------------------------------------- end of noise fnc\n\nvoid main() {\n    vec3 newPosition = position;\n\n    vUv = uv;\n    vNormal = normal;\n\n    // newPosition.z = sin(length(newPosition) * 30.0 + time) * 0.05;\n\n    float noise = snoise(vec4(normal * 50.0, time * 0.1));\n\n    newPosition = newPosition + (normal * noise) * 0.40;\n    \n    pulse = noise;\n\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0); \n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\n\nvoid main() {\n    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0); \n}";
 },{}],"shaders/fragment.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform sampler2D uTexture;\n\nvarying float pulse;\nvarying vec2 vUv;\nvarying vec3 vNormal;\n\nvoid main() {\n  float sinePulse = (1.0 + sin(vUv.x * 50.0 + time)) / 2.0;\n\n  vec4 myImage = texture(uTexture, vUv + sin(vUv * 20.0 + time) * 0.012);\n\n  float newPulse = (pulse + 1.0)*0.5;\n\n  gl_FragColor = vec4(pulse, 0.0, 0.0, 1.0);\n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\n\nvoid main() {\n  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n}";
 },{}],"water.jpg":[function(require,module,exports) {
 module.exports = "/water.a2752b90.jpg";
 },{}],"app.js":[function(require,module,exports) {
@@ -37688,8 +37688,9 @@ var Sketch = /*#__PURE__*/function () {
     this.container = options.domElement;
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
-    this.camera = new THREE.PerspectiveCamera(70, this.width / this.height, 0.01, 10);
-    this.camera.position.z = 1;
+    this.camera = new THREE.PerspectiveCamera(30, this.width / this.height, 10, 1000);
+    this.camera.position.z = 600;
+    this.camera.fov = 2 * Math.atan(this.height / 2 / this.camera.position.z) * (180 / Math.PI);
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer({
       antialias: true
@@ -37721,7 +37722,7 @@ var Sketch = /*#__PURE__*/function () {
   }, {
     key: "addObjects",
     value: function addObjects() {
-      this.geometry = new THREE.SphereBufferGeometry(0.5, 160, 160);
+      this.geometry = new THREE.PlaneBufferGeometry(350, 350, 100, 100);
       this.material = new THREE.ShaderMaterial({
         uniforms: {
           time: {

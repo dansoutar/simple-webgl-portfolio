@@ -92,4 +92,27 @@
 
 - set camera position to 600
 - calculate fov to be screen size
--
+
+## Creating Zoom effect
+
+- import dat gui
+- add this.setupSettings() method
+- inside func create a this.setting object on the class
+- obj that has a progress property with val of 0
+- this.gui = new dat gui
+- this.gui add (check video)
+- create new uniform uProgress
+- update the value of uprogress in the render func and set it to this.settings.progress
+- bring uprogress uniform into frag shader
+- bring uprogress into vert shader
+- bring utexture uniform into frag shader
+- bring vuv into vertex , set it to uv and bring into frag shader
+- use texture func to show texsture on plane
+- switch texture to checkered
+- make plane swaure at 300
+- move plane x pos to the right
+- create defualt state of mesh in vert shader
+- set = to modelMatrix x vec4 position
+- create fullScreenPos = to same without modelMatrix
+- make finalState var = to a mix() of default and fullscreen state
+- add rotation to mesh

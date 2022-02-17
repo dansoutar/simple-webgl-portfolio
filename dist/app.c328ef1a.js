@@ -37646,9 +37646,9 @@ class MapControls extends OrbitControls {
 
 exports.MapControls = MapControls;
 },{"three":"node_modules/three/build/three.module.js"}],"shaders/vertex.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform float uProgress;\n\nvarying vec2 vUv;\n\nvoid main() {\n\n    vUv = uv;\n\n    vec4 defaultState = modelMatrix * vec4(position, 1.0);\n    vec4 fullScreenState = vec4(position, 1.0);\n    vec4 finalState = mix(defaultState, fullScreenState, uProgress);\n\n    gl_Position = projectionMatrix * viewMatrix * finalState; \n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform float uProgress;\nuniform vec2 uResolution;\nuniform vec2 uQuadSize;\nuniform vec2 uTextureSize;\n\nvarying vec2 vUv;\nvarying vec2 vSize;\n\nvoid main() {\n\n    vUv = uv;\n\n    vec4 defaultState = modelMatrix * vec4(position, 1.0);\n    vec4 fullScreenState = vec4(position, 1.0);\n\n    fullScreenState.x *= uResolution.x / uQuadSize.x;\n    fullScreenState.y *= uResolution.y / uQuadSize.y;\n\n    vec4 finalState = mix(defaultState, fullScreenState, uProgress);\n\n    vSize = mix(uQuadSize, uResolution, uProgress);\n\n    gl_Position = projectionMatrix * viewMatrix * finalState;\n}";
 },{}],"shaders/fragment.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform sampler2D uTexture;\nuniform float uProgress;\n\nvarying vec2 vUv;\n\nvoid main() {\n\n  vec4 image = texture(uTexture, vUv);\n\n  gl_FragColor = image;\n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform float uProgress;\nuniform sampler2D uTexture;\nuniform vec2 uTextureSize;\n\nvarying vec2 vUv;\nvarying vec2 vSize;\n\nvec2 getUv(vec2 uv, vec2 textureSize, vec2 quadSize) {\n  vec2 tempUv = uv - vec2(0.5);\n\n  float quadAspect = quadSize.x / quadSize.y;\n  float textureAspect = textureSize.x / textureSize.y;\n\n  if (quadAspect < textureAspect) {\n    tempUv = tempUv * vec2(quadAspect / textureAspect, 1.0);\n  } else {\n    tempUv = tempUv * vec2(1.0, textureAspect / quadAspect );\n  }\n\n  tempUv += vec2(0.5); \n  return tempUv;\n}\n\nvoid main() {\n  vec2 correctUv = getUv(vUv, uTextureSize, vSize);\n  vec4 image = texture(uTexture, correctUv);\n\n  gl_FragColor = image;\n}";
 },{}],"texture.jpg":[function(require,module,exports) {
 module.exports = "/texture.c370f71b.jpg";
 },{}],"node_modules/dat.gui/build/dat.gui.module.js":[function(require,module,exports) {
@@ -40654,6 +40654,15 @@ var Sketch = /*#__PURE__*/function () {
           uTexture: {
             value: new THREE.TextureLoader().load(_texture.default)
           },
+          uResolution: {
+            value: new THREE.Vector2(this.width, this.height)
+          },
+          uQuadSize: {
+            value: new THREE.Vector2(300, 300)
+          },
+          uTextureSize: {
+            value: new THREE.Vector2(100, 100)
+          },
           uProgress: {
             value: 0
           }
@@ -40664,7 +40673,8 @@ var Sketch = /*#__PURE__*/function () {
         fragmentShader: _fragment.default
       });
       this.mesh = new THREE.Mesh(this.geometry, this.material);
-      this.scene.add(this.mesh);
+      this.scene.add(this.mesh); // Default state
+
       this.mesh.position.x = 300;
       this.mesh.rotation.z = 0.5;
     }
@@ -40716,7 +40726,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56945" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62132" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

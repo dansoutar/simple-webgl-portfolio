@@ -93,7 +93,7 @@
 - set camera position to 600
 - calculate fov to be screen size
 
-## Creating Zoom effect
+## Creating Zoom effect - 1
 
 - import dat gui
 - add this.setupSettings() method
@@ -116,3 +116,22 @@
 - create fullScreenPos = to same without modelMatrix
 - make finalState var = to a mix() of default and fullscreen state
 - add rotation to mesh
+
+## Creating Zoom effect - 2
+
+- add uresolution uniform with width and height of screen
+- uniform - uQuadsize - vec2 300 300
+- bring above into to vert shader
+- fullscreenstate.x will be the resolution.x / quadsize.x (size of plane)
+- fullscreenstate.y will be the resolution.y / quadsize.y (size of plane)
+
+## Fixing UV aspect ratio
+
+- add utexture uniform with 100, 100 which gives the size of textsure for aspect ratio
+- create vec2 size - mix(quadsize, uresolution, uprogress)
+- make above a varying to pass to frag shader - vSize
+- bring into frag shader
+- newUv = vUv - vec2(0.5) + vec(0.5) - scaling uv's
+- above keeps texture in center
+- create function getUv - watch vid
+- calc uv's to stay centered (background cover formula)

@@ -63,6 +63,9 @@ export default class Sketch {
         time: { value: 1.0 },
         resolution: { value: new THREE.Vector2() },
         uTexture: { value: new THREE.TextureLoader().load(testTexture) },
+        uResolution: { value: new THREE.Vector2(this.width, this.height) },
+        uQuadSize: { value: new THREE.Vector2(300, 300) },
+        uTextureSize: { value: new THREE.Vector2(100, 100) },
         uProgress: { value: 0 }
       },
       side: THREE.DoubleSide,
@@ -74,6 +77,7 @@ export default class Sketch {
 
     this.scene.add(this.mesh)
 
+    // Default state
     this.mesh.position.x = 300
     this.mesh.rotation.z = 0.5
   }

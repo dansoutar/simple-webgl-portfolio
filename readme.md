@@ -135,3 +135,14 @@
 - above keeps texture in center
 - create function getUv - watch vid
 - calc uv's to stay centered (background cover formula)
+
+## Effect with corners
+
+- add uConrners uniform in js - make it a vec2 starting at 0,0
+- uProgress to 0 by default
+- import gsap
+- create gsap timeline
+- .to the x and y uCorners values to 1 suing gsap
+- declare the uniform in uCorners in the vertex shader
+- this.tl.prgoess(this.settings.progress)
+-

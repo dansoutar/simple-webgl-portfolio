@@ -7,6 +7,7 @@ import fragmentShader from './shaders/fragment.glsl'
 import testTexture from './texture.jpg'
 
 import * as dat from 'dat.gui'
+import gsap from 'gsap'
 
 export default class Sketch {
   constructor(options) {
@@ -60,26 +61,56 @@ export default class Sketch {
     this.geometry = new THREE.PlaneBufferGeometry(300, 300, 100, 100)
     this.material = new THREE.ShaderMaterial({
       uniforms: {
-        time: { value: 1.0 },
         resolution: { value: new THREE.Vector2() },
-        uTexture: { value: new THREE.TextureLoader().load(testTexture) },
-        uResolution: { value: new THREE.Vector2(this.width, this.height) },
+        time: { value: 1.0 },
+        uCorners: { value: new THREE.Vector4(0, 0, 0, 0) },
+        uProgress: { value: 0 },
         uQuadSize: { value: new THREE.Vector2(300, 300) },
-        uTextureSize: { value: new THREE.Vector2(100, 100) },
-        uProgress: { value: 0 }
+        uResolution: { value: new THREE.Vector2(this.width, this.height) },
+        uTexture: { value: new THREE.TextureLoader().load(testTexture) },
+        uTextureSize: { value: new THREE.Vector2(100, 100) }
       },
       side: THREE.DoubleSide,
       // wireframe: true,
       vertexShader,
       fragmentShader
     })
-    this.mesh = new THREE.Mesh(this.geometry, this.material)
 
+    this.tl = gsap
+      .timeline()
+      .to(this.material.uniforms.uCorners.value, {
+        x: 1,
+        duration: 1
+      })
+      .to(
+        this.material.uniforms.uCorners.value,
+        {
+          y: 1,
+          duration: 1
+        },
+        0.1
+      )
+      .to(
+        this.material.uniforms.uCorners.value,
+        {
+          z: 1,
+          duration: 1
+        },
+        0.4
+      )
+      .to(
+        this.material.uniforms.uCorners.value,
+        {
+          w: 1,
+          duration: 1
+        },
+        0.6
+      )
+
+    this.mesh = new THREE.Mesh(this.geometry, this.material)
     this.scene.add(this.mesh)
 
-    // Default state
     this.mesh.position.x = 300
-    this.mesh.rotation.z = 0.5
   }
 
   render() {
@@ -87,6 +118,7 @@ export default class Sketch {
 
     this.material.uniforms.time.value = this.time
     this.material.uniforms.uProgress.value = this.settings.progress
+    this.tl.progress(this.settings.progress)
 
     this.mesh.rotation.x = this.time / 2000
     this.mesh.rotation.y = this.time / 1000
